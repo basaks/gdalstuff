@@ -3,7 +3,6 @@
 #          Description
 #
 #          This script uses `gnu parallel`. 
-#          It calls the scrip `crop_gtif.py` to do the real work in parallel.
 #          Change `inputdir`, `outdir`, and `extents` as required.
 #          For help with `extents`, see `help` in `gdalwarp`.
 #          
