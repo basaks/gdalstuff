@@ -1,1 +1,1 @@
-./gdal_calc.py --calc="1/A" -A Rad2016Th_K.tif --outfile=Rad2016K_Th.tif --co "BLOCKXSIZE=128" --co "BLOCKYSIZE=128"
+gdal_translate -of GTiff -co "BLOCKXSIZE=128" -co "BLOCKYSIZE=128" -co "TILED=YES" dem_fill.tif dem_fill_tiled.tif
