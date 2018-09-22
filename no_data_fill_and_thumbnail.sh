@@ -10,7 +10,7 @@ module load python3/3.5.2 python3/3.5.2-matplotlib
 module gdal/2.0.0 geos/3.5.0 gcc/4.9.0
 module load parallel
 
-COMMON_OPTIONS="-co BLOCKXSIZE=128 -co BLOCKYSIZE=128 -co TILED=YES -co COMPRESS=LZW"
+export COMMON_OPTIONS="-co BLOCKXSIZE=128 -co BLOCKYSIZE=128 -co TILED=YES -co COMPRESS=LZW"
 covar_file=/g/data/ge3/covariates/national_albers/albers_tifs.txt
 outdir=/g/data/ge3/covariates/national_albers/albers_tifs_filled
 
