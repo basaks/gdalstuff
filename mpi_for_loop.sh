@@ -9,14 +9,7 @@ module unload intel-cc
 module load python3/3.5.2 python3/3.5.2-matplotlib
 module load hdf5/1.8.10 gdal/2.0.0 geos/3.5.0 proj/4.9.3 gcc/4.9.0
 module load openmpi/1.8 parallel
-export PATH=$HOME/.local/bin:$PATH
-export PYTHONPATH=$HOME/.local/lib/python3.5/site-packages:$PYTHONPATH
-export VIRTUALENVWRAPPER_PYTHON=/apps/python3/3.5.2/bin/python3
-export LC_ALL=en_AU.UTF-8
-export LANG=en_AU.UTF-8
-source $HOME/.local/bin/virtualenvwrapper.sh
-export WORKON_HOME=/g/data/ge3/john/venvs/
-export UNCOVER=$HOME/uncover-ml
+
 workon class
 
 export COMMON_OPTIONS="-co BLOCKXSIZE=256 -co BLOCKYSIZE=256 -co TILED=YES -co COMPRESS=LZW -co BIGTIFF=YES"
