@@ -27,6 +27,14 @@ export partitions=20
 # new no data
 export NODATA=-9999
 
+# basename and filename manipulation
+# https://stackoverflow.com/questions/965053/extract-filename-and-extension-in-bash
+# bn=$(basename -- "$f")
+
+# replace extensions
+# out_file=albers_${bn%.tif}.filled.tif
+
+
 function project {
     outdir=$1
     f=$2
