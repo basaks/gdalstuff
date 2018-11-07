@@ -409,12 +409,12 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         input_file = Path(inShapeName)
-
+        cur_dir = Path()
         for f in input_file.parent.glob(input_file.stem + '.*'):
 
-            out_f = input_file.parent.joinpath(f.stem + '_covs' + f.suffix)
+            out_f = cur_dir.joinpath(f.stem + '_covs' + f.suffix)
             shutil.copy(f.as_posix(), out_f.as_posix(), follow_symlinks=False)
-        inShapeName = input_file.parent.joinpath(input_file.stem + '_covs.shp').as_posix()
+        inShapeName = cur_dir.joinpath(input_file.stem + '_covs.shp').as_posix()
 
     if fields_descript:
         fields_csv = open(inShapeName.replace('.shp', '_fields.csv'), 'wb')
