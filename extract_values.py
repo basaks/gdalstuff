@@ -411,9 +411,9 @@ if __name__ == '__main__':
         input_file = Path(inShapeName)
 
         for f in input_file.parent.glob(input_file.stem + '.*'):
-            out_f = input_file.parent.joinpath(Path(f).stem + '_covs' + Path(f).suffix)
-            shutil.copy(f, out_f, follow_symlinks=False)
 
+            out_f = input_file.parent.joinpath(f.stem + '_covs' + f.suffix)
+            shutil.copy(f.as_posix(), out_f.as_posix(), follow_symlinks=False)
         inShapeName = input_file.parent.joinpath(input_file.stem + '_covs.shp').as_posix()
 
     if fields_descript:
