@@ -114,6 +114,18 @@ def _fill_partition(r_min, r_max):
         ods.close()
 
 
+def test_fill_no_data(input_raster, filled_raster):
+    ids = rio.open(input_raster.as_posix(), 'r')
+    idata = ids.read(1, masked=True)
+    i_nodata = ids.get_nodatavals()[0]
+
+    ods = rio.open(filled_raster.as_posix(), 'r')
+    odata = ods.read(1, masked=True)
+
+    odata.data[idata.mask] = i_nodata
+    np.testing.assert_array_almost_equal(idata.data, odata.data)
+
+
 if __name__ == '__main__':
 
     input_raster = sys.argv[1]
@@ -140,3 +152,5 @@ if __name__ == '__main__':
         _fill_partition(r_min, r_max)
 
     ids.close()
+
+    test_fill_no_data(src, dest)
