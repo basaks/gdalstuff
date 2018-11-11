@@ -115,6 +115,15 @@ def _fill_partition(r_min, r_max):
 
 
 def test_fill_no_data(input_raster, filled_raster):
+    """
+    1. Test that unmasked pixels in the input data remain intact
+    2. Test that tiling and partitioning has been implemented correctly.
+    3. Test that if nodata is present in input raster, some are filled.
+
+    :param input_raster: input raster before nodata fill
+    :param filled_raster: output nodata filled raster
+
+    """
     ids = rio.open(input_raster.as_posix(), 'r')
     idata = ids.read(1, masked=True)
     i_nodata = ids.get_nodatavals()[0]
@@ -122,8 +131,15 @@ def test_fill_no_data(input_raster, filled_raster):
     ods = rio.open(filled_raster.as_posix(), 'r')
     odata = ods.read(1, masked=True)
 
+    # assign input nodatavalue in positions where input data was masked
     odata.data[idata.mask] = i_nodata
+
+    # test that the tiles and partitions have been implemented correctly
     np.testing.assert_array_almost_equal(idata.data, odata.data)
+
+    # test that if nodata holes exist in the input raster, they are filled
+    if idata.mask.sum():
+        assert idata.mask.sum() > odata.mask.sum()
 
 
 if __name__ == '__main__':
