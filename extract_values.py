@@ -28,8 +28,8 @@
 # MA 02111-1307, USA.
 #
 
-# basic useage:
-# python extract_values.py /path/to/shapeflile.shp -d /path/to/rasters_dir/
+# basic usage:
+# python extract_values.py /path/to/shapeflile.shp -d /path/to/rasters_dir/ -e tif -o /path/to/output_shapefile.shp
 
 # ******************************************************************************
 
@@ -392,7 +392,7 @@ if __name__ == '__main__':
         elif arg == '-e':
             i += 1
             ext = args[i]
-        elif args == '-o':
+        elif arg == '-o':
             i += 1
             outShapeName = args[i]
         elif inShapeName is None:
@@ -409,12 +409,27 @@ if __name__ == '__main__':
         sys.exit(1)
     else:
         input_file = Path(inShapeName)
-        cur_dir = Path()
-        for f in input_file.parent.glob(input_file.stem + '.*'):
+        out_dir = Path()  # current dir
+        if outShapeName is not None:
+            outShapeName = Path(outShapeName)
+            if outShapeName.exists():
+                print('Output shape file exists. Delete {} before proceeding'.format(outShapeName.as_posix()))
+                sys.exit(1)
+            else:  # create output file structure
+                out_dir = outShapeName.parent
 
-            out_f = cur_dir.joinpath(f.stem + '_covs' + f.suffix)
+        # manage files
+        for f in input_file.parent.glob(input_file.stem + '.*'):
+            if outShapeName is None:
+                out_f = out_dir.joinpath(f.stem + '_covs' + f.suffix)
+            else:
+                out_f = out_dir.joinpath(outShapeName.stem + '_covs' + f.suffix)
             shutil.copy(f.as_posix(), out_f.as_posix(), follow_symlinks=False)
-        inShapeName = cur_dir.joinpath(input_file.stem + '_covs.shp').as_posix()
+
+        if outShapeName is None:
+            inShapeName = out_dir.joinpath(input_file.stem + '_covs.shp').as_posix()
+        else:
+            inShapeName = out_dir.joinpath(outShapeName.stem + '_covs.shp').as_posix()
 
     if fields_descript:
         fields_csv = open(inShapeName.replace('.shp', '_fields.csv'), 'wb')
@@ -439,7 +454,6 @@ if __name__ == '__main__':
                     # look for supported rasters in directory
                     files = glob.glob(rasterPath + f)
                     inRasters.extend(files)
-
     if len(inRasters) == 0:
         print('No input rasters selected.')
         usage()
