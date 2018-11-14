@@ -30,6 +30,7 @@
 
 # basic usage:
 # python extract_values.py /path/to/shapeflile.shp -d /path/to/rasters_dir/ -e tif -o /path/to/output_shapefile.shp
+# python extract_values.py /path/to/shapeflile.shp -rl /path/to/raster1.tif -rl /path/to/raster2.tif -o /path/to/output_shapefile.shp
 
 # ******************************************************************************
 
@@ -421,9 +422,9 @@ if __name__ == '__main__':
         # manage files
         for f in input_file.parent.glob(input_file.stem + '.*'):
             if outShapeName is None:
-                out_f = out_dir.joinpath(f.stem + '_covs' + f.suffix)
+                out_f = out_dir.joinpath(f.stem + f.suffix)
             else:
-                out_f = out_dir.joinpath(outShapeName.stem + '_covs' + f.suffix)
+                out_f = out_dir.joinpath(outShapeName.stem + f.suffix)
             shutil.copy(f.as_posix(), out_f.as_posix(), follow_symlinks=False)
 
         if outShapeName is None:
