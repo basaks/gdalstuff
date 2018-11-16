@@ -18,8 +18,7 @@ function project {
     else
       echo got $dtype not Float32;
       gdalwarp -overwrite -r near -t_srs EPSG:3577 -tr 85 85 $COMMON_OPTIONS ${f} ${outdir}/${f##*/};
-    fi
-    rm $f
+    fi    
 }
 
 export -f project
