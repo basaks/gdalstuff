@@ -6,7 +6,8 @@ function act {
     if [[ "$nodata" = "-3.4028234663852886e+38" || "$nodata" = "-3.40282346638529011e+38" || "$nodata" = "3.40282346600000016e+38" || "$nodata" = "-3.40282346638527991e+38" || "$nodata" = "-3.40282306073709653e+38" ]] ;
       then
       echo change $nodata in $f;
-      gdalwarp -dstnodata -9999 $f $f.temp
+      gdal_calc.py -A $f --NoDataValue=-9999 --outfile=$f.temp --calc="-9999*(A<-9999)+A*(A>=-9999)"
+      # gdalwarp -dstnodata -9999 $f $f.temp
       mv $f.temp $f
       else
       echo not changing $nodata in $f;
