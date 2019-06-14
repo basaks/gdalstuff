@@ -1,3 +1,7 @@
+"""
+This script will filter a shapefile using the user provided upper and lower
+quantiles and write a new shapefile.
+"""
 import click
 import geopandas as gpd
 from scipy import quantile
