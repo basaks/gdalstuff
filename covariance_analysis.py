@@ -1,3 +1,4 @@
+from joblib import Parallel, delayed
 import rasterio as rio
 from pathlib import Path
 import numpy as np
@@ -19,8 +20,13 @@ for s in selected:
                                  'currently support only single banded '
                                  'rasters.'.format(s=s))
 
-data = {Path(s).stem: rio.open(s).read(masked=True).flatten()
-        for s in selected}
+
+def _read_file(s):
+    return rio.open(s).read(masked=True).flatten()
+
+
+p_data = Parallel(n_jobs=-1)(delayed(_read_file)(s) for s in selected)
+data = {Path(s).stem: d for s, d in zip(selected, p_data)}
 
 mask = pd.DataFrame.from_dict(data={k: v.mask for k, v in data.items()})
 df = pd.DataFrame.from_dict(data={k: v.data for k, v in data.items()})
