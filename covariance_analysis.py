@@ -52,16 +52,19 @@ cols = dfs.columns
 df_data = scale(dfs)
 cov_mat = np.cov(df_data, rowvar=False)
 
-f, ax = plt.subplots(figsize=(9, 8))
+f, ax = plt.subplots(figsize=(15, 13))
 corrmat = pd.DataFrame(df_data, columns=cols).corr()
 sns.heatmap(corrmat, ax=ax, cmap="YlGnBu", linewidths=0.1)
-plt.savefig('{}.png'.format('results/Correlation-Matrix'))
+plt.savefig('{}.png'.format('results/Correlation-Matrix'),
+            dpi=300, bbox_inches='tight')
 
-f, ax = plt.subplots(figsize=(9, 8))
+f, ax = plt.subplots(figsize=(15, 13))
 sns.heatmap(cov_mat, ax=ax, cmap="YlGnBu", linewidths=0.1)
-plt.savefig('{}.png'.format('results/Covariance-Matrix'))
+plt.savefig('{}.png'.format('results/Covariance-Matrix'), dpi=300,
+            bbox_inches='tight')
 
-f, ax = plt.subplots(figsize=(9, 8))
+f, ax = plt.subplots(figsize=(15, 13))
 cg = sns.clustermap(corrmat, cmap="YlGnBu", linewidths=0.1)
 plt.setp(cg.ax_heatmap.yaxis.get_majorticklabels(), rotation=0)
-plt.savefig('{}.png'.format('results/Correlation-Clustermap'))
+plt.savefig('{}.png'.format('results/Correlation-Clustermap'), dpi=300,
+            bbox_inches='tight')
