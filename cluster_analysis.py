@@ -11,19 +11,28 @@ import matplotlib.pylab as plt
 import seaborn as sns
 
 
-def __check_raster(tifs):
+def __check_raster(tifs, skip_multiband):
+    qualified = []
     for s in tifs:
         with rio.open(s) as f:
             if len(f.nodatavals) > 1:
-                raise AttributeError('file {s} has more than one band. We '
-                                     'currently support only single banded '
-                                     'rasters.'.format(s=s))
+                if not skip_multiband:
+                    raise AttributeError('file {s} has more than one band. We '
+                                         'currently support only single banded '
+                                         'rasters.'.format(s=s))
+
+                else:
+                    print("Warning: Skipped multiband raster {} as skip "
+                          "opted".format(s))
+            else:
+                qualified.append(s)
+    return qualified
 
 
 total_length = None
 
 
-def _read_file(s, skip_multiband):
+def _read_file(s):
     global total_length
     print('Reading file {}'.format(s))
     f = rio.open(s)
@@ -32,12 +41,8 @@ def _read_file(s, skip_multiband):
         print('File {} with size {}'.format(s, total_length))
     else:
         print('File {} with size {}'.format(s, f.height*f.width))
-        if not skip_multiband:
-            if total_length != f.height * f.width:
-                raise AttributeError("file {} is not equal to the others".format(s))
-        else:
-            print("Warning: Skipped multiband raster {} as skip "
-                  "opted".format(s))
+        if total_length != f.height * f.width:
+            raise AttributeError("file {} is not equal to the others".format(s))
 
     return rio.open(s).read(masked=True).flatten()
 
@@ -51,11 +56,12 @@ def _read_file(s, skip_multiband):
               help='Automatically skip multiband rasters')
 def remove_outliers(raster, features_dir, skip_multiband):
 
-    tifs = list(Path(features_dir).glob('*.tif'))
+    tifs = __check_raster(list(Path(features_dir).glob('*.tif')),
+                          skip_multiband)
 
-    p_data = [_read_file(s, skip_multiband) for s in tifs]
+    p_data = [_read_file(s) for s in tifs]
 
-    data = {Path(s).stem: d for s, d in zip(tifs, p_data)}
+    data = {Path(s).stem: d for s, d in zip(tifs, p_data) if len(d)}
 
     mask = pd.DataFrame.from_dict(data={k: v.mask for k, v in data.items()})
     df = pd.DataFrame.from_dict(data={k: v.data for k, v in data.items()})
@@ -64,7 +70,7 @@ def remove_outliers(raster, features_dir, skip_multiband):
 
     print('After removing masked values: shape {}'.format(df.shape))
 
-    classes = _read_file(raster, False)
+    classes = _read_file(raster)
 
     # sample now
     cols = df.columns
