@@ -5,7 +5,6 @@ features of the cluster in raster form to produce cluster interpretation plots.
 
 import click
 from pathlib import Path
-import numpy as np
 import pandas as pd
 import rasterio as rio
 import matplotlib.pylab as plt
@@ -24,7 +23,7 @@ def __check_raster(tifs):
 total_length = None
 
 
-def _read_file(s):
+def _read_file(s, skip_multiband):
     global total_length
     print('Reading file {}'.format(s))
     f = rio.open(s)
@@ -33,8 +32,12 @@ def _read_file(s):
         print('File {} with size {}'.format(s, total_length))
     else:
         print('File {} with size {}'.format(s, f.height*f.width))
-        if total_length != f.height * f.width:
-            raise AttributeError("file {} is not equal to the others".format(s))
+        if not skip_multiband:
+            if total_length != f.height * f.width:
+                raise AttributeError("file {} is not equal to the others".format(s))
+        else:
+            print("Warning: Skipped multiband raster {} as skip "
+                  "opted".format(s))
 
     return rio.open(s).read(masked=True).flatten()
 
@@ -44,11 +47,13 @@ def _read_file(s):
 @click.option('-f', '--features_dir', required=True,
               help='Dir with features that contributed to this '
                    'classification/clustering output')
-def remove_outliers(raster, features_dir):
+@click.option('-s', '--skip_multiband', required=False, is_flag=True,
+              help='Automatically skip multiband rasters')
+def remove_outliers(raster, features_dir, skip_multiband):
 
     tifs = list(Path(features_dir).glob('*.tif'))
 
-    p_data = [_read_file(s) for s in tifs]
+    p_data = [_read_file(s, skip_multiband) for s in tifs]
 
     data = {Path(s).stem: d for s, d in zip(tifs, p_data)}
 
@@ -59,7 +64,7 @@ def remove_outliers(raster, features_dir):
 
     print('After removing masked values: shape {}'.format(df.shape))
 
-    classes = _read_file(raster)
+    classes = _read_file(raster, False)
 
     # sample now
     cols = df.columns
