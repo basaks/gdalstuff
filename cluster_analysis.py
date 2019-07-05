@@ -56,8 +56,9 @@ def _read_file(s):
               help='Automatically skip multiband rasters')
 def remove_outliers(raster, features_dir, skip_multiband):
 
-    tifs = __check_raster(list(Path(features_dir).glob('*.tif')),
-                          skip_multiband)
+    tifs = list(Path(features_dir).glob('*.tif'))
+    tifs.append(raster)
+    tifs = __check_raster(tifs, skip_multiband)
 
     p_data = [_read_file(s) for s in tifs]
 
@@ -65,21 +66,19 @@ def remove_outliers(raster, features_dir, skip_multiband):
 
     mask = pd.DataFrame.from_dict(data={k: v.mask for k, v in data.items()})
     df = pd.DataFrame.from_dict(data={k: v.data for k, v in data.items()})
+
     print('Original data with shape {}'.format(df.shape))
     df = df[~mask.any(axis=1)]
 
     print('After removing masked values: shape {}'.format(df.shape))
 
-    classes = _read_file(raster)
-
     # sample now
     cols = df.columns
-    df['class'] = classes
     dfs = df.sample(frac=0.1)
 
     for c in cols:
         plt.figure()
-        sns.boxplot(x='class', y=c, data=dfs)
+        sns.boxplot(x=Path(raster).stem, y=c, data=dfs)
         plt.savefig(c + '.png')
 
 
