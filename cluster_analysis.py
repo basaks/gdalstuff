@@ -54,7 +54,7 @@ def _read_file(s):
                    'classification/clustering output')
 @click.option('-s', '--skip_multiband', required=False, is_flag=True,
               help='Automatically skip multiband rasters')
-def remove_outliers(raster, features_dir, skip_multiband):
+def analyse_cluster(raster, features_dir, skip_multiband):
 
     tifs = list(Path(features_dir).glob('*.tif'))
     tifs.append(raster)
@@ -83,4 +83,4 @@ def remove_outliers(raster, features_dir, skip_multiband):
 
 
 if __name__ == '__main__':
-    remove_outliers()
+    analyse_cluster()
