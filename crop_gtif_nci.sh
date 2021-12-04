@@ -17,6 +17,9 @@
 #PBS -l wd
 #PBS -j oe
 
+
+
+
 module load parallel
 module load gdal
 
@@ -35,3 +38,8 @@ export -f crop
 ls ${inputdir}/*.tif | parallel crop ${outdir}
 
 # -te = xmin ymin xmax ymax]
+# cov_file=./first_rank.txt
+# cat $cov_file | parallel crop ${outdir}
+
+
+
