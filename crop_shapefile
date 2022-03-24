@@ -1,0 +1,2 @@
+# load gdal and all first
+ogr2ogr -f "ESRI Shapefile" wa_crop.shp all_wa_1in10.shp -clipsrc -1619218 -3944717 -1148184 -3505790
