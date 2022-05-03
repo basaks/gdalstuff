@@ -42,4 +42,7 @@ ls ${inputdir}/*.tif | parallel crop ${outdir}
 # cat $cov_file | parallel crop ${outdir}
 
 
-
+# parallel copy large files
+function pcopy { f=$1; echo copying $f ...; cp ${f} covs/${f##*/} ; }
+export -f pcopy
+cat /g/data/ge3/john/MAJORS/CNN_test/2022_list.txt | parallel pcopy
