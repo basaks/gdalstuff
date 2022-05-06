@@ -43,12 +43,35 @@ function dockerised_crop {
       --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/albers_cropped/ \
       /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
       gdalwarp \
+      -dstnodata -340282346638528859811704183484516925440 \
+      -t_srs EPSG:3577 \
+      -tr 80.0 80.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -ot Float32 \
+      /albers_cropped/${f##*/} /cogs/majors_covs_80m_large_no_data/${f##*/} -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+
+
+function dockerised_crop {
+    f=$1
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/albers_cropped/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdalwarp \
       -dstnodata 'nan' \
       -t_srs EPSG:3577 \
       -tr 80.0 80.0 \
       -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
-      /albers_cropped/${f##*/} /cogs/majors_covs_80m/${f##*/} -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+      -ot Float32 \
+      /albers_cropped/${f##*/} /cogs/majors_covs_80m_05_05/${f##*/} -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
 }
+
+#      -dstnodata -340282346638528859811704183484516925440 \
+
 
 export -f dockerised_crop
 cat /path/to/some/text/file_with_raster_paths.txt | parallel dockerised_crop
