@@ -3,8 +3,16 @@ python gdal_calc.py -A input.tif --NoDataValue=-9999 --outfile=input.temp.tif --
 
 
 
-python gdal_calc.py -A input.tif \
-  --NoDataValue=-340282346638528859811704183484516925440 \
-  --outfile=input.temp.tif \
-  --calc="-340282346638528859811704183484516925440*numpy.isnan(A)+ (~numpy.isnan(A))*A" --allBands=A \
-  --co BIGTIFF=YES --co COMPRESS=LZW
+function apply_gdal_cacl {
+    f=$1
+    echo ${f}  dale_fixed/${f##*/}.tif;
+    gdal_calc.py -A ${f} \
+      --NoDataValue=-340282346638528859811704183484516925440 \
+      --outfile=dale_fixed/${f##*/}.tif \
+      --calc="-340282346638528859811704183484516925440*numpy.isnan(A)+ (~numpy.isnan(A))*A" --allBands=A \
+      --co BIGTIFF=YES --co COMPRESS=LZW \
+      -- type Float32 \
+      --hideNoData;
+    echo finished converting  ${f##*/}.tif;
+}
+

@@ -54,19 +54,20 @@ function dockerised_crop {
 
 
 
-function dockerised_crop {
+function dockerised_crop_dale_fixed {
     f=$1
     singularity exec \
       --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
       --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/albers_cropped/ \
       /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
       gdalwarp \
-      -dstnodata 'nan' \
+      -srcnodata 'nan' \
+      -dstnodata -340282346638528859811704183484516925440 \
       -t_srs EPSG:3577 \
       -tr 80.0 80.0 \
       -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
       -ot Float32 \
-      /albers_cropped/${f##*/} /cogs/majors_covs_80m_05_05/${f##*/} -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+      /albers_cropped/${f##*/} /cogs/dale_fixed/${f##*/} -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
     echo ====== processed ${f} ====== ;
 }
 
