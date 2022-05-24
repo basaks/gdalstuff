@@ -69,20 +69,66 @@ function dockerised_crop_rad2016k_th_fixed {
     echo ====== processed ${f} ====== ;
 }
 
-function dockerised_crop_water_fixed {
+
+function dockerised_crop_dale {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/u46/users/dxr251/:/mount_dir/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdalwarp \
+      -dstnodata 'nan' \
+      -t_srs EPSG:3577 \
+      -tr 30.0 30.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -ot Float32 \
+      /mount_dir/be30-thematic/${f##*/} /cogs/be30-thematic-albers-cogs/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+
+function dockerised_crop_rad2016k_th_fixed {
     f=$1
     singularity exec \
       --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
       --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/albers_cropped/ \
       /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
       gdalwarp \
-      -srcnodata 'nan' \
+      -srcnodata 340282346638528859811704183484516925440 \
       -dstnodata -340282346638528859811704183484516925440 \
       -t_srs EPSG:3577 \
       -tr 80.0 80.0 \
       -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
       -ot Float32 \
       /albers_cropped/${f##*/} /cogs/dale_fixed/${f##*/} -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+function dockerised_crop_water_fixed {
+    f=$1
+    if test -f majors_covs_80m_large_no_data/${f##*/}; then
+        echo majors_covs_80m_large_no_data/${f##*/} exists.
+        exit 0
+    fi
+
+    if test -f dale_fixed/${f##*/}; then
+        echo dale_fixed/${f##*/} exists.
+        exit 0
+    fi
+#    singularity exec \
+#      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+#      --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/albers_cropped/ \
+#      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+#      gdalwarp \
+#      -dstnodata -340282346638528859811704183484516925440 \
+                  -339999995214436424907732413799364296704
+#      -t_srs EPSG:3577 \
+#      -tr 80.0 80.0 \
+#      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+#      -ot Float32 \
+#      /albers_cropped/${f##*/} /cogs/national_80m_large_no_data/${f##*/} -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
     echo ====== processed ${f} ====== ;
 }
 
