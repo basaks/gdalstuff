@@ -89,6 +89,43 @@ function dockerised_crop_dale {
 }
 
 
+function dockerised_mask_coversion_to_albers_cogs {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/mount_dir/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdalwarp \
+      -t_srs EPSG:3577 \
+      -tr 80.0 80.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -ot Byte \
+      /mount_dir/${f##*/} /cogs/80m_albers/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+
+function dockerised_conversion_from_large_no_data {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/ge3/sudipta/jobs/cogs/dale_fixed/:/mount_dir/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdalwarp \
+      -dstnodata 'nan' \
+      -t_srs EPSG:3577 \
+      -tr 80.0 80.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -ot Float32 \
+      /mount_dir/${f##*/} /cogs/dale_fixed_nan_no_data/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+
 function dockerised_crop_rad2016k_th_fixed {
     f=$1
     singularity exec \
@@ -122,8 +159,8 @@ function dockerised_crop_water_fixed {
 #      --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/albers_cropped/ \
 #      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
 #      gdalwarp \
-#      -dstnodata -340282346638528859811704183484516925440 \
-                  -339999995214436424907732413799364296704
+#      -dstnodata -340282346638528859811704183484516925440 \ min(np.float32)
+#                  -339999995214436424907732413799364296704    --- csiro covariates, min(np.float32)
 #      -t_srs EPSG:3577 \
 #      -tr 80.0 80.0 \
 #      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
