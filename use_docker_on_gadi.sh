@@ -107,21 +107,75 @@ function dockerised_mask_coversion_to_albers_cogs {
 }
 
 
+function extract_data_type {
+  f=$1
+  type=gdalinfo $f  | grep Type | cut -d '=' -f 3 | cut -d ',' -f 1
+  echo $type
+}
+
+whitebox_tools -r=MaxElevationDeviation -v --dem= \
+        -out_mag=$PWD/ \
+        --out_scale=$PWD/${flt}_scale${scale}.flt \
+        --min_scale=${min_scale} --max_scale=${max_scale} --step=${step}
+
+whitebox_tools -r=MaxElevationDeviation \
+  --dem=/g/data/ge3/sudipta/jobs/cogs/80m_albers/demh1sv1_0_80m_albers.tif \
+  --o /DEVmax_mag.tif  --min_scale=1 --max_scale=1000 --step=5
+
+function dockerised_conversion_csiro_clim {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/ge3/data/data_in_transit/:/mount_dir/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdalwarp \
+      -dstnodata 'nan' \
+      -r bilinear \
+      -t_srs EPSG:3577 \
+      -tr 30.0 30.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -ot Float32 \
+      /mount_dir/${f##*/} /cogs/30m_rad_ratios/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+function dockerised_conversion_gdal_calc {
+    f=$1
+    echo will convert ${f##*/} to mask_30m_albers.tif
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/ge3/sudipta/jobs/cogs/30m_albers/:/mount_dir/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdal_calc.py \
+      --calc="(numpy.isfinite(A))" \
+      --hideNoData \
+      --NoDataValue=0 \
+      --type Byte \
+      -A /mount_dir/${f##*/} \
+      --outfile /cogs/30m_albers/mask_30m_albers.tif \
+      --format GTiff --co BIGTIFF=YES --co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+
 function dockerised_conversion_from_large_no_data {
     f=$1
     basename=${f##*/}
     echo will convert ${f##*/} to ${basename%.*}.tif
     singularity exec \
       --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
-      --bind /g/data/ge3/sudipta/jobs/cogs/dale_fixed/:/mount_dir/ \
+      --bind /g/data/ge3/data/data_in_transit/gamma/:/mount_dir/ \
       /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
       gdalwarp \
       -dstnodata 'nan' \
+      -r bilinear \
       -t_srs EPSG:3577 \
       -tr 80.0 80.0 \
       -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
       -ot Float32 \
-      /mount_dir/${f##*/} /cogs/dale_fixed_nan_no_data/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+      /mount_dir/${f##*/} /cogs/80m_rad_ratios/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
     echo ====== processed ${f} ====== ;
 }
 
