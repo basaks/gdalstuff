@@ -74,18 +74,37 @@ function dockerised_crop_dale {
     f=$1
     basename=${f##*/}
     echo will convert ${f##*/} to ${basename%.*}.tif
-    singularity exec \
-      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
-      --bind /g/data/u46/users/dxr251/:/mount_dir/ \
-      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
-      gdalwarp \
-      -dstnodata 'nan' \
-      -t_srs EPSG:3577 \
-      -tr 30.0 30.0 \
-      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
-      -ot Float32 \
-      /mount_dir/be30-thematic/${f##*/} /cogs/be30-thematic-albers-cogs/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
-    echo ====== processed ${f} ====== ;
+    type=$(gdalinfo $f  | grep Type | cut -d '=' -f 3 | cut -d ',' -f 1)
+    echo $type
+    if [ "$type" == "Float32" ]; then
+      singularity exec \
+            --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+            --bind /g/data/u46/users/dxr251/:/mount_dir/ \
+            /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+            gdalwarp  \
+            -r bilinear \
+            -t_srs EPSG:3577 \
+            -tr 80.0 80.0 \
+            -dstnodata 'nan' \
+            -ot Float32 \
+            -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+            /mount_dir/be30-thematic/${f##*/} /cogs/be80-thematic-albers-cogs/${basename%.*}.tif \
+            -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+      echo ====== processed float32 raster ${f} ====== ;
+      else echo not float;
+        singularity exec \
+            --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+            --bind /g/data/u46/users/dxr251/:/mount_dir/ \
+            /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+            gdalwarp \
+            -r bilinear \
+            -t_srs EPSG:3577 \
+            -tr 80.0 80.0 \
+            -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+            /mount_dir/be30-thematic/${f##*/} /cogs/be80-thematic-albers-cogs/${basename%.*}.tif \
+            -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+      echo ====== processed non float raster type "$type" ${f} ====== ;
+    fi
 }
 
 
@@ -109,7 +128,7 @@ function dockerised_mask_coversion_to_albers_cogs {
 
 function extract_data_type {
   f=$1
-  type=gdalinfo $f  | grep Type | cut -d '=' -f 3 | cut -d ',' -f 1
+  type=$(gdalinfo $f  | grep Type | cut -d '=' -f 3 | cut -d ',' -f 1)
   echo $type
 }
 
