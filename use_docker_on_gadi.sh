@@ -69,6 +69,39 @@ function dockerised_crop_rad2016k_th_fixed {
     echo ====== processed ${f} ====== ;
 }
 
+docker_image=/g/data/ge3/sudipta/jobs/docker/gdal_latest.sif
+common_args="-r bilinear -t_srs EPSG:3577 -of COG -co BIGTIFF=YES -co COMPRESS=LZW"
+
+function dockerised_crop_dale {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    type=$(gdalinfo $f  | grep Type | cut -d '=' -f 3 | cut -d ',' -f 1)
+    echo $type
+    if [ "$type" == "Float32" ]; then
+      singularity exec \
+            --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+            --bind /g/data/ge3/sudipta/jobs/cogs/csiro_30m/:/mount_dir/ \
+            $docker_image \
+            gdalwarp  \
+            -tr 80.0 80.0 \
+            -dstnodata 'nan' \
+            -ot Float32 \
+            -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+            /mount_dir/${f##*/} /cogs/80m_albers/${basename%.*}.tif $common_args;
+      echo ====== processed float32 raster ${f} ====== ;
+      else echo not float;
+        singularity exec \
+            --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+            --bind /g/data/ge3/sudipta/jobs/cogs/csiro_30m/:/mount_dir/ \
+            $docker_image \
+            gdalwarp \
+            -tr 80.0 80.0 \
+            -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+            /mount_dir/${f##*/} /cogs/80m_albers/${basename%.*}.tif $common_args;
+      echo ====== processed non float raster type "$type" ${f} ====== ;
+    fi
+}
 
 function dockerised_crop_dale {
     f=$1
@@ -84,11 +117,11 @@ function dockerised_crop_dale {
             gdalwarp  \
             -r bilinear \
             -t_srs EPSG:3577 \
-            -tr 80.0 80.0 \
+            -tr 30.0 30.0 \
             -dstnodata 'nan' \
             -ot Float32 \
             -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
-            /mount_dir/be30-thematic/${f##*/} /cogs/be80-thematic-albers-cogs/${basename%.*}.tif \
+            /mount_dir/be30-thematic/${f##*/} /cogs/be30-thematic-albers-cogs/${basename%.*}.tif \
             -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
       echo ====== processed float32 raster ${f} ====== ;
       else echo not float;
@@ -99,14 +132,16 @@ function dockerised_crop_dale {
             gdalwarp \
             -r bilinear \
             -t_srs EPSG:3577 \
-            -tr 80.0 80.0 \
+            -tr 30.0 30.0 \
             -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
-            /mount_dir/be30-thematic/${f##*/} /cogs/be80-thematic-albers-cogs/${basename%.*}.tif \
+            /mount_dir/be30-thematic/${f##*/} /cogs/be30-thematic-albers-cogs/${basename%.*}.tif \
             -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
       echo ====== processed non float raster type "$type" ${f} ====== ;
     fi
 }
 
+
+/g/data/ge3/covariates/national_albers_filled_new/albers_cropped/s2-dpca-85m_band1.tif - Nodata = None, not nan
 
 function dockerised_mask_coversion_to_albers_cogs {
     f=$1
