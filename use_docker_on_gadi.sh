@@ -70,7 +70,7 @@ function dockerised_crop_rad2016k_th_fixed {
 }
 
 docker_image=/g/data/ge3/sudipta/jobs/docker/gdal_latest.sif
-common_args="-r bilinear -t_srs EPSG:3577 -of COG -co BIGTIFF=YES -co COMPRESS=LZW"
+common_args="-t_srs EPSG:3577 -of COG -co BIGTIFF=YES -co COMPRESS=LZW"
 
 function dockerised_crop_dale {
     f=$1
@@ -84,6 +84,7 @@ function dockerised_crop_dale {
             --bind /g/data/ge3/sudipta/jobs/cogs/csiro_30m/:/mount_dir/ \
             $docker_image \
             gdalwarp  \
+            -r bilinear \
             -tr 80.0 80.0 \
             -dstnodata 'nan' \
             -ot Float32 \
@@ -96,6 +97,7 @@ function dockerised_crop_dale {
             --bind /g/data/ge3/sudipta/jobs/cogs/csiro_30m/:/mount_dir/ \
             $docker_image \
             gdalwarp \
+            -r nearest \
             -tr 80.0 80.0 \
             -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
             /mount_dir/${f##*/} /cogs/80m_albers/${basename%.*}.tif $common_args;
@@ -156,6 +158,26 @@ function dockerised_mask_coversion_to_albers_cogs {
       -tr 80.0 80.0 \
       -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
       -ot Byte \
+      /mount_dir/${f##*/} /cogs/80m_albers/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+
+function set_nodata_and_dtype {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/ge3/sudipta/jobs/cogs/csiro_30m/:/mount_dir/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdalwarp \
+      -t_srs EPSG:3577 \
+      -tr 80.0 80.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -r nearest \
+      -ot Int16 \
+      -dstnodata -9999 \
       /mount_dir/${f##*/} /cogs/80m_albers/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
     echo ====== processed ${f} ====== ;
 }
