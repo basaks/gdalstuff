@@ -169,7 +169,29 @@ function set_nodata_and_dtype {
     echo will convert ${f##*/} to ${basename%.*}.tif
     singularity exec \
       --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
-      --bind /g/data/ge3/sudipta/jobs/cogs/csiro_30m/:/mount_dir/ \
+      --bind /g/data/ge3/sudipta/jobs/cogs/mrvbf_test:/mount_dir/ \
+      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+      gdalwarp \
+      -t_srs EPSG:3577 \
+      -tr 80.0 80.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -r nearest \
+      -ot Int16 \
+      -srcnodata 255 \
+      -dstnodata -9999 \
+      /mount_dir/${f##*/} /cogs/80m_albers/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+#"/g/data/ge3/covariates/national_albers_filled_new/albers_cropped/s2-dpca-85m.tif"
+
+
+function set_nodata_and_dtype {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    singularity exec \
+      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+      --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/mount_dir/ \
       /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
       gdalwarp \
       -t_srs EPSG:3577 \
