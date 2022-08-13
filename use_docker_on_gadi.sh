@@ -411,12 +411,36 @@ function ec_crop {
   gdalwarp -te 627320 -3763932 774876 -3674850 ${f} ec_crop/${f##*/} -overwrite
 }
 
+function ec_crop_large {
+  f=$1
+  echo  will convert ${f} into ec_crop/${f##*/}
+  gdalwarp -te 579575, -3876615, 979900, -3586467 ${f} ec_crop_large/${f##*/} -overwrite
+}
+
+# cat 1in10/cogs_first_rank_natuonal.txt | parallel ec_crop_large
+
 function wa_crop {
   f=$1
   echo  will convert ${f} into wa_covariates/${f##*/}
   gdalwarp -te -1968200 -4004450 -215350 -1235420 ${f} wa_covariates/${f##*/} -overwrite
 }
 # -te -1968200 -4004450 -215350 -1235420
+
+
+function wa_crop_small_long {
+  f=$1
+  echo  will convert ${f} into wa_covariates/${f##*/}
+  gdalwarp -te -1158962 -3438568 -908932 -2321364 ${f} wa_crop_small_long/${f##*/} -overwrite
+}
+
+#[Yesterday 10:43] Sudipta Basak
+#[10:42] John Wilford
+#-1158962 -908932.
+#
+#[10:42] John Wilford
+#-2321364 -3438568      WA crop corner coordiantes
+
+
 
 # WA files
 #Upper Left  (-1668147.000,-3268289.000) (114d36'59.34"E, 29d 1'50.40"S)
