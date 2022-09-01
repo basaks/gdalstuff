@@ -433,6 +433,32 @@ function wa_crop_small_long {
   gdalwarp -te -1158962 -3438568 -908932 -2321364 ${f} wa_crop_small_long/${f##*/} -overwrite
 }
 
+
+
+function wa_crop_does_not_work {
+  f=$1
+  echo  will convert ${f} into wa_covariates/${f##*/}
+  gdalwarp -te -1404357 -3409574 -977054 -2226781 ${f} wa_crop_longer/${f##*/} -overwrite
+}
+
+function wa_crop_works {
+  f=$1
+  echo  will convert ${f} into wa_covariates/${f##*/}
+  gdalwarp -te -1343345 -3409574 -977054 -2226781 ${f} wa_crop_longer/${f##*/} -overwrite
+}
+
+
+#df['POINT_X'] = df.geometry.x
+#df['POINT_Y'] = df.geometry.y
+# df1 = df[(df.POINT_X > -1404357) & (df.POINT_Y > -3409574) & (df.POINT_X < -977054) & (df.POINT_Y < -2226781)]
+
+#(-1404357.6667447388,
+# -3409574.679312084,
+# -977054.7288055345,
+# -2226781.4934713207)
+#
+
+
 #[Yesterday 10:43] Sudipta Basak
 #[10:42] John Wilford
 #-1158962 -908932.
@@ -448,3 +474,11 @@ function wa_crop_small_long {
 #Upper Right ( -783670.000,-3268289.000) (123d47'38.46"E, 29d49'11.09"S)
 #Lower Right ( -783670.000,-3933119.000) (123d19'18.55"E, 35d45'32.86"S)
 #Center      (-1225908.500,-3600704.000) (118d49'54.63"E, 32d26'53.77"S)
+
+
+gdalwarp $output.vrt $output.tif $cogs_big_albers \
+	      -tr 80.0 80.0 \
+	      -r bilinear \
+	      -ot Float32 \
+	      -dstnodata 'nan' \
+	      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000
