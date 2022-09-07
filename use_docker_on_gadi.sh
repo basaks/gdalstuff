@@ -444,7 +444,7 @@ function wa_crop_does_not_work {
 function wa_crop_works {
   f=$1
   echo  will convert ${f} into wa_covariates/${f##*/}
-  gdalwarp -te -1343345 -3409574 -977054 -2226781 ${f} wa_crop_longer/${f##*/} -overwrite
+  gdalwarp -te -1343345 -3409574 -977054 -2226781 ${f} wa_crop_selected/${f##*/} -overwrite
 }
 
 
