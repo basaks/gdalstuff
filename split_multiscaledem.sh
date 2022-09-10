@@ -1,3 +1,11 @@
+# from nan nodata to real no data + other stuff
+
+# first multiply by 10_000_000
+gdal_calc.py --hideNoData -A cropped_dem.tif --outfile=cropped_dem_x10.tif --calc="10000000*A*(~numpy.isnan(A))-340282346638528859811704183484516925440*numpy.isnan(A)" --overwrite --debug --NoDataValue=-340282346638528859811704183484516925440
+gdalwarp cropped_dem_x10.tif cropped_dem_x10_lxw.tif -co BIGTIFF=NO -co COMPRESS=LZW
+parallel -j 3 -u --link maxeledev ::: 1 2 3 ::: 3 100 800 ::: 99 795 1800 ::: 1 5 10 ::: cropped_dem_x10_lxw
+
+
 maxeledev(){
     echo "Calculate maxeledev for dem: $5 with params min_scale:$2, max_scale:$3, step: $4"
     scale=$1
@@ -6,19 +14,21 @@ maxeledev(){
     step=$4
     dem=$5
 
-     whitebox_tools -r=MaxElevationDeviation -v --dem=$PWD/${dem}.tif \
-        --out_mag=$PWD/${dem}_mag_${scale}.tif \
-        --out_scale=$PWD/${dem}_scale_${scale}.tif \
+    whitebox_tools -r=MaxElevationDeviation -v --dem=$PWD/${dem}.tif \
+        --out_mag=$PWD/${dem}_mag_${scale}_min_scale_${min_scale}_max_scale_${max_scale}_step_${step}.tif \
+        --out_scale=$PWD/${dem}_scale_${scale}_min_scale_${min_scale}_max_scale_${max_scale}_step_${step}.tif \
         --min_scale=${min_scale} --max_scale=${max_scale} --step=${step}
 
     # remove the unused _scale file
-    rm $PWD/${dem}_scale_${scale}.*
+    rm $PWD/${dem}_scale_${scale}_min_scale_${min_scale}_max_scale_${max_scale}_step_${step}.tif
 }
 
 
 min_scales=(3 100 800)
 max_scales=(99 795 1800)
 steps=(1 5 10)
+
+parallel -j 3 -u --link maxeledev ::: 1 2 3 ::: 3 100 800 ::: 99 795 1800 ::: 1 5 10 ::: demh1sv1_0_80m_albers_X10m
 
 export -f maxeledev
 
