@@ -1,9 +1,9 @@
 # from nan nodata to real no data + other stuff
 
 # first multiply by 10_000_000
-gdal_calc.py --hideNoData -A cropped_dem.tif --outfile=cropped_dem_x10.tif --calc="10000000*A*(~numpy.isnan(A))-340282346638528859811704183484516925440*numpy.isnan(A)" --overwrite --debug --NoDataValue=-340282346638528859811704183484516925440
-gdalwarp cropped_dem_x10.tif cropped_dem_x10_lxw.tif -co BIGTIFF=NO -co COMPRESS=LZW
-parallel -j 3 -u --link maxeledev ::: 1 2 3 ::: 3 100 800 ::: 99 795 1800 ::: 1 5 10 ::: cropped_dem_x10_lxw
+gdal_calc.py --hideNoData -A demh1sv1_0_80m_albers.tif --outfile=demh1sv1_0_80m_albers_x10.tif --calc="10000000*A*(~numpy.isnan(A))-340282346638528859811704183484516925440*numpy.isnan(A)" --overwrite --debug --NoDataValue=-340282346638528859811704183484516925440
+gdalwarp demh1sv1_0_80m_albers_x10.tif demh1sv1_0_80m_albers_x10_int32.tif -co BIGTIFF=NO -co COMPRESS=LZW -ot Int32 -overwrite
+parallel -j 3 -u --link maxeledev ::: 1 2 3 ::: 3 100 800 ::: 99 795 1800 ::: 1 5 10 ::: demh1sv1_0_80m_albers_x10_int32
 
 
 maxeledev(){
