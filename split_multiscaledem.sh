@@ -6,6 +6,9 @@ gdalwarp demh1sv1_0_80m_albers_x10.tif demh1sv1_0_80m_albers_x10_int32.tif -co B
 parallel -j 3 -u --link maxeledev ::: 1 2 3 ::: 3 100 800 ::: 99 795 1800 ::: 1 5 10 ::: demh1sv1_0_80m_albers_x10_int32
 
 
+# stemname=${f%.tif};
+
+
 maxeledev(){
     echo "Calculate maxeledev for dem: $5 with params min_scale:$2, max_scale:$3, step: $4"
     scale=$1

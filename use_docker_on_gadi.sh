@@ -220,6 +220,36 @@ whitebox_tools -r=MaxElevationDeviation \
   --dem=/g/data/ge3/sudipta/jobs/cogs/80m_albers/demh1sv1_0_80m_albers.tif \
   --o /DEVmax_mag.tif  --min_scale=1 --max_scale=1000 --step=5
 
+function convert_csiro {
+  f=$1
+  basename=${f##*/}
+  gdalwarp \
+    -dstnodata 'nan' \
+    -r bilinear \
+    -t_srs EPSG:3577 \
+    -tr 80.0 80.0 \
+    -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+    -ot Float32 \
+    ${f} 80m/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+}
+
+
+function convert_csiro_byte {
+  f=$1
+  basename=${f##*/}
+  gdalwarp \
+    -r bilinear \
+    -t_srs EPSG:3577 \
+    -tr 30.0 30.0 \
+    -r nearest \
+    -ot Int16 \
+    -dstnodata -9999 \
+    -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+    ${f} 30m/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+}
+
+
+
 function dockerised_conversion_csiro_clim {
     f=$1
     basename=${f##*/}
