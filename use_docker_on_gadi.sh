@@ -308,6 +308,22 @@ function dockerised_conversion_from_large_no_data {
 }
 
 
+function convert {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ./30m/${basename%.*}.tif
+    gdalwarp \
+      -dstnodata 'nan' \
+      -r bilinear \
+      -t_srs EPSG:3577 \
+      -tr 30.0 30.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -ot Float32 \
+      ${f##*/} ./30m/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
+
+
 #
 #[15/07 15:17] John Wilford
 #built 2 new 30 geology class covariates  - /g/data/ge3/data/data_in_transit/Lithology_Surface_Geology30M.tif
