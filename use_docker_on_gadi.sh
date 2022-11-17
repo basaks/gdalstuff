@@ -3,6 +3,10 @@ singularity pull --dir . docker://osgeo/gdal
 
 export SINGULARITY_ARGS=""
 
+# dale roberts vrt
+# /g/data/u46/users/dxr251/be30-thematic/ND-SWIR1-NIR.vrt
+
+
 singularity exec \
   --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/albers_cropped/ \
   --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
@@ -520,7 +524,11 @@ function wa_crop_works {
 #Upper Right ( -783670.000,-3268289.000) (123d47'38.46"E, 29d49'11.09"S)
 #Lower Right ( -783670.000,-3933119.000) (123d19'18.55"E, 35d45'32.86"S)
 #Center      (-1225908.500,-3600704.000) (118d49'54.63"E, 32d26'53.77"S)
-
+gdalwarp /g/data/u46/users/dxr251/be30-thematic/ND-SWIR1-NIR.vrt ND-SWIR1-NIR_no_data.tif $cogs_big_albers \
+	      -tr 80.0 80.0 \
+	      -r bilinear \
+	      -ot Float32 \
+	      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000
 
 gdalwarp $output.vrt $output.tif $cogs_big_albers \
 	      -tr 80.0 80.0 \
@@ -528,3 +536,6 @@ gdalwarp $output.vrt $output.tif $cogs_big_albers \
 	      -ot Float32 \
 	      -dstnodata 'nan' \
 	      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000
+
+
+parallel -u gdalwarp -r bilinear  -t_srs EPSG:3577 -tr {1} {1} -dstnodata 'nan' -ot Float32 -te  -2000000.000 -4899990.000 2200020.000 -1050000.000  /g/data/ge3/data/data_in_transit/DEM-S_27m.tif dem_s_{1}m.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW ::: 30 80
