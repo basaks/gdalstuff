@@ -1,0 +1,1 @@
+parallel -u qdel {} ::: `nqstat -P ge3 | grep 648 | cut -b 1-8`

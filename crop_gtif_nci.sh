@@ -33,6 +33,15 @@ function crop {
     gdalwarp -overwrite -te 131.580261 -24.565301 144.473705 -13.786752 ${f} ${outdir}/${f##*/};
 }
 
+function nt_qld_crop {
+  outdir=$1;
+  f=$2;
+  gdalwarp -overwrite -te -1555680.000 -1052892.000 1596582.000 -2666354.000 ${f} ${outdir}/${f##*/};
+}
+
+export -f nt_qld_crop
+cat first_rank_new.txt | parallel -u --dryrun nt_qld_crop first_rank_new_covs/ {}
+
 function lake_eyre_crop_small {
     outdir=$1
     f=$2
