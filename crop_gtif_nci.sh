@@ -36,7 +36,7 @@ function crop {
 function nt_qld_crop {
   outdir=$1;
   f=$2;
-  gdalwarp -overwrite -te -1555680.000 -1052892.000 1596582.000 -2666354.000 ${f} ${outdir}/${f##*/};
+  gdalwarp -overwrite -te -1555680.000 -2666354.000 1596582.000 -1052892.000 ${f} ${outdir}/${f##*/};
 }
 
 export -f nt_qld_crop

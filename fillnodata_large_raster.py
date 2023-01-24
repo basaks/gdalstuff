@@ -61,7 +61,7 @@ def _fill_tile(r, c, row_min, row_max):
         orig_data = ids.read(1, masked=True, window=window_write)
         return Tile(data=orig_data, window=window_write)
 
-    data_filled = fillnodata(tile_data, mask=None, max_search_distance=kernel_size)
+    data_filled = fillnodata(tile_data, mask=None, max_search_distance=kernel_size, smoothing_iterations=2)
 
     # return r_buffer_b, r_buffer_t, c_buffer_l, c_buffer_r, data_filled, window_write
     data_write = data_filled[
@@ -106,7 +106,7 @@ def _fill_partition(r_min, r_max):
     # write filled data
     if rank == 0:
         print('now writing data')
-        ods = rio.open(dest.as_posix(), 'r+')
+        ods = rio.open(dest.as_posix(), 'r+', **profile)
         for s in range(size):
             for tile in all_tiles[s]:
                 ods.write_band(1, tile.data, window=tile.window)
@@ -152,11 +152,12 @@ if __name__ == '__main__':
 
     src = Path(input_raster)
     dest = src.with_suffix('.filled.tif')
-
     # manage files
     _get_source_data(src, dest)
 
     ids = rio.open(src.as_posix(), 'r')
+    profile: rio.profiles.Profile = ids.profile
+    profile.update(compress='lzw')
 
     p_rows_min_max = np.linspace(0, ids.shape[0], partitions + 1, dtype=int)
 

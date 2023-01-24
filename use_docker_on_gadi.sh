@@ -469,13 +469,13 @@ function ec_crop_large {
 
 # cat 1in10/cogs_first_rank_natuonal.txt | parallel ec_crop_large
 
-function wa_crop {
+function all_wa_crop {
   f=$1
   echo  will convert ${f} into wa_covariates/${f##*/}
   gdalwarp -te -1968200 -4004450 -215350 -1235420 ${f} wa_covariates/${f##*/} -overwrite
 }
 # -te -1968200 -4004450 -215350 -1235420
-
+cat cut_covs.txt | parallel -u -j 5 all_wa_crop {1}
 
 function wa_crop_small_long {
   f=$1
@@ -484,7 +484,7 @@ function wa_crop_small_long {
 }
 
 
-
+find
 function wa_crop_does_not_work {
   f=$1
   echo  will convert ${f} into wa_covariates/${f##*/}

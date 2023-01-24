@@ -3,9 +3,9 @@ python gdal_calc.py -A input.tif --NoDataValue=-9999 --outfile=input.temp.tif --
 
 
 
-function apply_gdal_cacl {
+function apply_gdal_calc {
     f=$1
-    echo ${f}  dale_fixed/${f##*/}.tif;
+    echo ${f}  befixed/${f##*/}.tif;
     gdal_calc.py -A ${f} \
       --NoDataValue=-340282346638528859811704183484516925440 \
       --outfile=dale_fixed/${f##*/}.tif \

@@ -1,0 +1,1 @@
+for f in `find /g/data/ge3/sudipta/80m_albers/ -name \*.tif`; do echo $f,$(basename $f) >> 80m_albers_2023_01_24_relative_and_basename.txt ; done
