@@ -477,6 +477,13 @@ function all_wa_crop {
 # -te -1968200 -4004450 -215350 -1235420
 cat cut_covs.txt | parallel -u -j 5 all_wa_crop {1}
 
+function all_nsw_crop {
+  f=$1
+  echo  will convert ${f} into nsw_covariates/${f##*/}
+  gdalwarp -te 822967 -4214815 2095684 -3169286 ${f} nsw_crop/${f##*/} -overwrite
+}
+cat cut_covs.txt | parallel -u -j 5 all_nsw_crop {1}
+
 function wa_crop_small_long {
   f=$1
   echo  will convert ${f} into wa_covariates/${f##*/}
