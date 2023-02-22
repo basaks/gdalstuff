@@ -475,7 +475,33 @@ function all_wa_crop {
   gdalwarp -te -1968200 -4004450 -215350 -1235420 ${f} wa_covariates/${f##*/} -overwrite
 }
 # -te -1968200 -4004450 -215350 -1235420
+# -te xmin ymin xmax ymax]
 cat cut_covs.txt | parallel -u -j 5 all_wa_crop {1}
+
+
+function all_clhs_crop {
+  f=$1
+  echo  will convert ${f} into wa_covariates/${f##*/}
+  gdalwarp -te -1170045  -3307303 -998391  -2978042 ${f} clhs_covariates/${f##*/} -overwrite
+}
+cat cut_covs.txt | parallel -u -j 5 all_clhs_crop {1}
+
+
+#  downsample_upsample this will have a low pass filter like impact
+function downsample_upsample {
+  f=$1
+  bn=$(basename $1)
+  echo $bn
+  stemname=${bn%.tif}
+  echo $stemname
+  echo  will convert ${f} into ceno_covs_smooth/${stemname}.tif
+  gdalwarp -tr 4800 4800 ${f} ceno_covs_smooth/${stemname}_temp.tif -overwrite
+  gdalwarp -tr 80 80 ceno_covs_smooth/${stemname}_temp.tif ceno_covs_smooth/${stemname}.tif -overwrite
+  rm ceno_covs_smooth/${stemname}_temp.tif
+}
+cat cut_covs.txt | parallel -u -j 5 downsample_upsample {1}
+
+
 
 function all_nsw_crop {
   f=$1
