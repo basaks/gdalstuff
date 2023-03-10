@@ -1,0 +1,4 @@
+# https://superuser.com/a/1015734
+find . -type d -exec chmod 700 {} \;
+# for all directories begining from . the current directory, and
+find . -type f -exec chmod 600 {} \;

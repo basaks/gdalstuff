@@ -193,11 +193,11 @@ function set_nodata_and_dtype {
     f=$1
     basename=${f##*/}
     echo will convert ${f##*/} to ${basename%.*}.tif
-    singularity exec \
-      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
-      --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/mount_dir/ \
-      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
-      gdalwarp \
+#    singularity exec \
+#      --bind /g/data/ge3/sudipta/jobs/cogs/:/cogs/ \
+#      --bind /g/data/ge3/covariates/national_albers_filled_new/albers_cropped/:/mount_dir/ \
+#      /g/data/ge3/sudipta/jobs/docker/gdal_latest.sif \
+    gdalwarp \
       -t_srs EPSG:3577 \
       -tr 80.0 80.0 \
       -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
@@ -208,6 +208,21 @@ function set_nodata_and_dtype {
     echo ====== processed ${f} ====== ;
 }
 
+
+function convert_int {
+    f=$1
+    basename=${f##*/}
+    echo will convert ${f##*/} to ${basename%.*}.tif
+    gdalwarp \
+      -t_srs EPSG:3577 \
+      -tr 80.0 80.0 \
+      -te  -2000000.000 -4899990.000 2200020.000 -1050000.000 \
+      -r nearest \
+      -ot Int16 \
+      -dstnodata -9999 \
+      ${f} maps/${basename%.*}.tif -of COG -co BIGTIFF=YES -co COMPRESS=LZW;
+    echo ====== processed ${f} ====== ;
+}
 
 function extract_data_type {
   f=$1
