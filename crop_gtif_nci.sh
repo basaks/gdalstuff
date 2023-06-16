@@ -53,7 +53,7 @@ function crop {
     gdalwarp -overwrite -te -141513 -3790978 1867833 -1874085 ${f} lake_eyre_covs/${f##*/};
 }
 
-tr -d '\r' < infile > outfile  # dos2unix dostounix
+tr -d '\r' < infile > outfile  # dos2unix dostounix windows
 
 export -f crop
 

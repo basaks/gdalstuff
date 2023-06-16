@@ -5,4 +5,10 @@ find . -type f -exec chmod 600 {} \;
 
 
 # read only for all, except myself
-find 80m_covarites/ -type d -exec chmod 755 {} \
+find 80m_covarites/ -type d -exec chmod 755 {} \;
+
+
+# x=xyz.2.3.4.fc15.i686
+# ${x#*fc}
+# ${y%.*}
+# echo $z

@@ -56,6 +56,7 @@ function dockerised_crop {
     echo ====== processed ${f} ====== ;
 }
 
+
 function dockerised_crop_rad2016k_th_fixed {
     f=$1
     singularity exec \
@@ -74,7 +75,7 @@ function dockerised_crop_rad2016k_th_fixed {
 }
 
 docker_image=/g/data/ge3/sudipta/jobs/docker/gdal_latest.sif
-common_args="-t_srs EPSG:3577 -of COG -co BIGTIFF=YES -co COMPRESS=LZW"
+  common_args="-t_srs EPSG:3577 -of COG -co BIGTIFF=YES -co COMPRESS=LZW"
 
 function dockerised_crop_dale {
     f=$1
