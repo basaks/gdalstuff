@@ -1,2 +1,7 @@
 # load gdal and all first
 ogr2ogr -f "ESRI Shapefile" wa_crop.shp all_wa_1in10.shp -clipsrc -1619218 -3944717 -1148184 -3505790
+
+
+# use gdal to crop + parallel use
+# parallel stop quotes being passed twice https://stackoverflow.com/a/8231011
+cat ../interpolated/all_interpolated_shs.txt | parallel --progress -u -j 20 -q ogr2ogr -f "ESRI Shapefile" {/.}.shp {} -clipsrc -1528011 -3915630 -1059130 -3349357

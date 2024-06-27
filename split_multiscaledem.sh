@@ -26,7 +26,6 @@ maxeledev(){
     rm $PWD/${dem}_scale_${scale}_min_scale_${min_scale}_max_scale_${max_scale}_step_${step}.tif
 }
 
-
 min_scales=(3 100 800)
 max_scales=(99 795 1800)
 steps=(1 5 10)

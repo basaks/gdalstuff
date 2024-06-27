@@ -1,6 +1,9 @@
 python gdal_calc.py -A input.tif --NoDataValue=-9999 --outfile=input.temp.tif --calc="-9999*numpy.isnan(A)+ (~numpy.isnan(A))*A" --allBands=A;
 
 
+python gdal_calc.py -A variance.tif --outfile=sigma.tif --calc="numpy.sqrt(A)" --allBands=A;
+
+
 
 
 function apply_gdal_calc {
